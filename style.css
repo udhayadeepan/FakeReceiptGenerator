@@ -152,9 +152,10 @@ h5{
 .op{
     
     font-size: 15px;
-    font-weight: 550;
-    color:rgba(26, 22, 22, 0.752);
+    font-weight: 540;
+    color:rgb(26, 22, 22);
     margin-bottom: -32px;
+    filter: blur(0px);
 }
 #ending{
     width: 130px;
