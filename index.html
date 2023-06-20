@@ -5,12 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gpay</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="gpay.png" type="image/x-icon">
     <script src="script.js"></script>
 </head>
 <body>
     <div id="form1">
         <img src="gpay.png" alt="">
         <h4>Google Pay Fake Receipt Generator</h4>
+        <p>If You have receiver QR , choose it</p>
+        <input type="file" accept="image/*" id="fileInput">
+        <canvas id="canvas" style="display: none;"></canvas>
+        <div id="result"></div>
+      
+        <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
+        <script>
+          const fileInput = document.getElementById('fileInput');
+          const resultDiv = document.getElementById('result');
+          const canvas = document.getElementById('canvas');
+          const ctx = canvas.getContext('2d');
+      
+          fileInput.addEventListener('change', handleFileSelect, false);
+      
+          function handleFileSelect(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+      
+            reader.onload = function (event) {
+              const image = new Image();
+              image.onload = function () {
+                canvas.width = image.width;
+                canvas.height = image.height;
+                ctx.drawImage(image, 0, 0);
+      
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
+      
+                if (qrCode && qrCode.data.substr(0,3)==="upi") {
+                 
+                  var queryString=qrCode.data;
+                    const upiIdMatch = queryString.match(/pa=([^&]+)/);
+                    const upiId = upiIdMatch ? upiIdMatch[1] : null;
+                    console.log('UPI ID:', upiId);
+
+                    // Extract UPI Name
+                    const upiNameMatch = queryString.match(/pn=([^&]+)/);
+                    const upiName = upiNameMatch ? decodeURIComponent(upiNameMatch[1]) : null;
+                    console.log('UPI Name:', upiName);
+
+                    document.getElementById("receiver-name-ip").value=upiName;
+                    document.getElementById("receiver-upi-ip").value=upiId;
+
+                
+                } else {
+                  resultDiv.innerText = 'No QR code found.Type Manually';
+                }
+              };
+      
+              image.src = event.target.result;
+            };
+      
+            reader.readAsDataURL(file);
+          }
+        </script>
+
+
         <input type="text" name="name" id="sender-name" placeholder="Enter Sender Name">
         <input type="text" name="upi" id="sender-upi-ip" placeholder="Enter Sender UPI ID">
         <input type="text" name="name" id="receiver-name-ip"  placeholder="Enter Receiver Name">
